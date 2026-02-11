@@ -18,6 +18,8 @@ public class CardHandler : MonoBehaviour
 
     public Button CardButton;
 
+    public GameObject BackFace;
+
     /// <summary>
     /// set the card details using the json data and also update the card visuals
     /// </summary>

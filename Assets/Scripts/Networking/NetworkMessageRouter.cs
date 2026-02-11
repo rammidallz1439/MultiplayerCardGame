@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 using Vault;
 using Mirror;
+
 public class NetworkMessageRouter : NetworkBehaviour
 {
     public static NetworkMessageRouter Instance;
@@ -16,6 +17,14 @@ public class NetworkMessageRouter : NetworkBehaviour
     public void SetLocalPlayer(CardNetworkPlayer player)
     {
         localPlayer = player;
+    }
+
+    public string GetLocalPlayerId()
+    {
+        if (localPlayer == null)
+            return null;
+
+        return localPlayer.playerId;
     }
 
     public void SendMessage(object msg)
@@ -34,15 +43,9 @@ public class NetworkMessageRouter : NetworkBehaviour
         }
     }
 
-
-    void HandleSyncBoard(string json)
-    {
-        SyncBoardMessage msg =
-            JsonConvert.DeserializeObject<SyncBoardMessage>(json);
-
-        GameEvents.SyncBoard?.Invoke(msg.opponentCardCount);
-    }
-
+    // =========================
+    // SERVER MESSAGE PROCESSING
+    // =========================
     public void ProcessServerMessage(string json)
     {
         BaseMessage baseMsg =
@@ -51,13 +54,35 @@ public class NetworkMessageRouter : NetworkBehaviour
         switch (baseMsg.action)
         {
             case "endTurn":
-                TurnSync.Instance.OnPlayerEndedTurn(json);
-                break;
+                {
+                    EndTurnMessage endMsg =
+                        JsonConvert.DeserializeObject<EndTurnMessage>(json);
+
+                    TurnSync.Instance.OnPlayerEndedTurn(endMsg.playerId);
+                    break;
+                }
+
+            case "syncBoard":
+                {
+                    SyncBoardMessage syncMsg =
+                        JsonConvert.DeserializeObject<SyncBoardMessage>(json);
+
+                    TurnSync.Instance.StoreFoldedCards(
+                        syncMsg.playerId,
+                        syncMsg.cardIds
+                    );
+                    break;
+                }
         }
     }
 
+    // =========================
+    // CLIENT MESSAGE PROCESSING
+    // =========================
     public void ProcessClientMessage(string json)
     {
+        Debug.Log("Client received: " + json);
+
         BaseMessage baseMsg =
             JsonConvert.DeserializeObject<BaseMessage>(json);
 
@@ -68,15 +93,46 @@ public class NetworkMessageRouter : NetworkBehaviour
                 break;
 
             case "revealSingleCard":
-                GameEvents.RevealCard?.Invoke();
+                HandleReveal(json);
                 break;
+
             case "syncBoard":
                 HandleSyncBoard(json);
+                break;
+
+            case "endTurn":
+                // Clients do nothing for endTurn
                 break;
         }
     }
 
-    void BroadcastFromServer(string json)
+    // =========================
+    // HELPERS
+    // =========================
+    void HandleSyncBoard(string json)
+    {
+        SyncBoardMessage msg =
+            JsonConvert.DeserializeObject<SyncBoardMessage>(json);
+
+        GameEvents.SyncBoard?.Invoke(
+            msg.playerId,
+            msg.cardIds.Count
+        );
+    }
+
+    void HandleReveal(string json)
+    {
+        RevealCardMessage msg =
+            JsonConvert.DeserializeObject<RevealCardMessage>(json);
+
+        GameEvents.RevealCard?.Invoke(
+            msg.playerId,
+            msg.cardId,
+            msg.orderIndex
+        );
+    }
+
+    public void BroadcastFromServer(string json)
     {
         foreach (var conn in NetworkServer.connections.Values)
         {
@@ -92,5 +148,4 @@ public class NetworkMessageRouter : NetworkBehaviour
             }
         }
     }
-
 }

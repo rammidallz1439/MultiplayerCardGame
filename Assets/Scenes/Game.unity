@@ -1954,6 +1954,7 @@ MonoBehaviour:
   TimerText: {fileID: 649168755}
   ScoreTest: {fileID: 1640414759}
   CostText: {fileID: 407670780}
+  OpponentCardsHolder: {fileID: 969034912}
   SelectedCard: {fileID: 0}
   IsRunning: 0
   GameStarted: 0

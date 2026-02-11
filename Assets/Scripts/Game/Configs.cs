@@ -72,7 +72,9 @@ public class RevealCardMessage
 public class SyncBoardMessage
 {
     public string action = "syncBoard";
-    public int opponentCardCount;
+    public string playerId;
+    public List<int> cardIds;
 }
+
 
 #endregion

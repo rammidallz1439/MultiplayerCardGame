@@ -14,6 +14,8 @@ public class GameController : GameManager, IController, ITick
     {
         GameEvents.GameStart += OnGameStart;
         GameEvents.SyncBoard += OnSyncBoard;
+        GameEvents.RevealCard += OnRevealCard;
+
 
     }
 

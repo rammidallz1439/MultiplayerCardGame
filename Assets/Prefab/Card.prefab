@@ -151,7 +151,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2380633338533251435
 RectTransform:
   m_ObjectHideFlags: 0
@@ -727,6 +727,7 @@ MonoBehaviour:
   CardCostText: {fileID: 209775808555851410}
   CardPowerText: {fileID: 5426755507915340930}
   CardButton: {fileID: 7370672850091303399}
+  BackFace: {fileID: 870845542711884608}
 --- !u!1 &8123708648515138258
 GameObject:
   m_ObjectHideFlags: 0

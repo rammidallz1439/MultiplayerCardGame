@@ -49,6 +49,8 @@ public class GameManager
     {
         GameEvents.GameStart -= OnGameStart;
         GameEvents.SyncBoard -= OnSyncBoard;
+        GameEvents.RevealCard -= OnRevealCard;
+
 
 
         Handler.PlayCardButton.onClick.RemoveListener(OnPlayCardButton);
@@ -69,6 +71,7 @@ public class GameManager
                 GameObject card = MonoHelper.Instance.InstantiateObject(Handler.CardPrefab, Handler.HandCardsHolder);
                 CardHandler cardHandler = card.GetComponent<CardHandler>();
                 cardHandler.SetCardDetails(config.Cards[i].ID, config.Cards[i].Cost, config.Cards[i].Power, config.Cards[i].Name);
+                cardHandler.BackFace.SetActive(false);
             }
 
         }
@@ -81,6 +84,8 @@ public class GameManager
                 GameObject card = MonoHelper.Instance.InstantiateObject(Handler.CardPrefab, Handler.HandCardsHolder);
                 CardHandler cardHandler = card.GetComponent<CardHandler>();
                 cardHandler.SetCardDetails(shuffledCards[i].ID, shuffledCards[i].Cost, shuffledCards[i].Power, shuffledCards[i].Name);
+                cardHandler.BackFace.SetActive(false);
+
             }
         }
  
@@ -146,24 +151,33 @@ public class GameManager
     {
         Handler.IsRunning = false;
 
+        string playerId = NetworkMessageRouter.Instance.GetLocalPlayerId();
+
+        // collect folded card IDs
+        List<int> foldedIds = new List<int>();
+
+        foreach (Transform card in Handler.PickcardsHolder)
+        {
+            CardHandler ch = card.GetComponent<CardHandler>();
+            foldedIds.Add(ch.ID);
+        }
+
         EndTurnMessage msg = new EndTurnMessage
         {
-            playerId = NetworkMessageRouter.Instance
-                .GetComponent<CardNetworkPlayer>()
-                .playerId
+            playerId = playerId
         };
-
         NetworkMessageRouter.Instance.SendMessage(msg);
-
 
         SyncBoardMessage syncMsg = new SyncBoardMessage
         {
-            opponentCardCount = Handler.FoldedCardCount
+            playerId = playerId,
+            cardIds = foldedIds
         };
         NetworkMessageRouter.Instance.SendMessage(syncMsg);
     }
 
-    
+
+
     protected void OnGameStart()
     {
 
@@ -179,19 +193,67 @@ public class GameManager
     }
 
 
-    protected  void OnSyncBoard(int opponentCardCount)
+    protected void OnSyncBoard(string playerId, int opponentCardCount)
     {
+        string localId = NetworkMessageRouter.Instance.GetLocalPlayerId();
+
+        // Ignore own sync message
+        if (playerId == localId)
+            return;
+
         Debug.Log("Opponent folded cards: " + opponentCardCount);
 
+        foreach (Transform child in Handler.OpponentCardsHolder)
+        {
+            MonoHelper.Instance.DestroyObject(child.gameObject);
+        }
 
         for (int i = 0; i < opponentCardCount; i++)
         {
-            GameObject card = MonoHelper.Instance.InstantiateObject(
+           GameObject obj= MonoHelper.Instance.InstantiateObject(
                 Handler.CardPrefab,
                 Handler.OpponentCardsHolder
             );
+
+
         }
     }
+
+    protected void OnRevealCard(string playerId, int cardId, int orderIndex)
+    {
+        string localId = NetworkMessageRouter.Instance.GetLocalPlayerId();
+
+        bool isOpponent = playerId != localId;
+
+        Transform holder = isOpponent
+            ? Handler.OpponentCardsHolder
+            : Handler.PickcardsHolder;
+
+        if (orderIndex >= holder.childCount)
+        {
+            Debug.LogWarning("Reveal index out of bounds: " + orderIndex);
+            return;
+        }
+
+        CardConfig config =
+            DataManager.Instance.LoadJsonFromResources<CardConfig>(
+                GameConstants.CardDataPath);
+
+        CardData data = config.Cards.Find(c => c.ID == cardId);
+        if (data == null) return;
+
+        Transform slot = holder.GetChild(orderIndex);
+        CardHandler card = slot.GetComponent<CardHandler>();
+
+        card.SetCardDetails(
+            data.ID,
+            data.Cost,
+            data.Power,
+            data.Name
+        );
+    }
+
+
 
 
     #endregion
