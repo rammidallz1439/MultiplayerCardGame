@@ -1,0 +1,54 @@
+{
+  "Cards": [
+    {
+      "ID": 1,
+      "Name": "Fire Imp",
+      "Cost": 1,
+      "Power": 2,
+      "Ability": {
+        "Type": "GainPoints",
+        "Value": 1
+      }
+    },
+    {
+      "ID": 2,
+      "Name": "Stone Golem",
+      "Cost": 1,
+      "Power": 5,
+      "Ability": {
+        "Type": "GainPoints",
+        "Value": 2
+      }
+    },
+    {
+      "ID": 3,
+      "Name": "Wind Archer",
+      "Cost": 2,
+      "Power": 3,
+      "Ability": {
+        "Type": "StealPoints",
+        "Value": 1
+      }
+    },
+    {
+      "ID": 4,
+      "Name": "Dark Sorcerer",
+      "Cost": 2,
+      "Power": 4,
+      "Ability": {
+        "Type": "DoublePower",
+        "Value": 2
+      }
+    },
+    {
+      "ID": 5,
+      "Name": "Light Guardian",
+      "Cost": 3,
+      "Power": 6,
+      "Ability": {
+        "Type": "DrawExtraCard",
+        "Value": 3
+      }
+    }
+  ]
+}
