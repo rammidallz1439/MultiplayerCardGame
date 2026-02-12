@@ -182,11 +182,11 @@ public class GameManager
             GenericEventsController.Instance.PopUpEvent(Handler.SelectedCard.gameObject, 1f);
             Handler.FoldedCardCount++;
 
+            Handler.CurrentCost -= Handler.SelectedCard.Cost;
+            Handler.CostText.text = Handler.CurrentCost.ToString();
 
             Handler.SelectedCard = null;
 
-            Handler.CurrentCost -= Handler.SelectedCard.Cost;
-            Handler.CostText.text = Handler.CurrentCost.ToString();
 
             Handler.PlayCardButton.gameObject.SetActive(false);
 
@@ -213,7 +213,7 @@ public class GameManager
 
     private void EndTurn()
     {
-        if (!Handler.IsRunning)
+        if (!Handler.IsRunning && Handler.SelectedCard == null)
             return;
 
         Handler.IsRunning = false;
