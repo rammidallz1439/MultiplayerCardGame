@@ -143,6 +143,14 @@ public class TurnSync : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
 
+        if (currentTurn >= GameConstants.TotalTurns)
+        {
+            Debug.Log("Game Over after turn " + currentTurn);
+
+            GameEvents.GameEnd?.Invoke();
+            yield break;
+        }
+
         currentTurn++;
 
         StartTurnMessage msg = new StartTurnMessage

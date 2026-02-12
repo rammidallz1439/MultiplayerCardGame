@@ -16,6 +16,7 @@ public class GameController : GameManager, IController, ITick
         GameEvents.SyncBoard += OnSyncBoard;
         GameEvents.RevealCard += OnRevealCard;
         GameEvents.StartNewTurn += OnStartNewTurn;
+        GameEvents.GameEnd += DetermineWinner;
     }
 
     public void OnRegisterListeners()

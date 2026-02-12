@@ -63,7 +63,7 @@ public class GameManager
         GameEvents.SyncBoard -= OnSyncBoard;
         GameEvents.RevealCard -= OnRevealCard;
         GameEvents.StartNewTurn -= OnStartNewTurn;
-
+        GameEvents.GameEnd -= DetermineWinner;
 
 
 
@@ -129,12 +129,6 @@ public class GameManager
     protected void OnStartNewTurn()
     {
 
-        if (Handler.CurrentTurn >= GameConstants.TotalTurns)
-        {
-            DetermineWinner();
-            return;
-        }
-
         Handler.CurrentTurn++;
 
         Handler.CurrentCost = Handler.CurrentTurn;
@@ -148,8 +142,9 @@ public class GameManager
     }
 
 
-    void DetermineWinner()
+     protected void DetermineWinner()
     {
+        Handler.IsRunning = false;
         int playerScore = int.Parse(Handler.ScoreTest.text);
         int opponentScore = int.Parse(Handler.OpponentScoreText.text);
 
@@ -172,7 +167,7 @@ public class GameManager
             Handler.GameOverPanel.SetActive(true);
         }
 
-        Handler.IsRunning = false;
+       
     }
 
 
@@ -190,7 +185,7 @@ public class GameManager
 
             Handler.SelectedCard = null;
 
-            Handler.CurrentCost--;
+            Handler.CurrentCost -= Handler.SelectedCard.Cost;
             Handler.CostText.text = Handler.CurrentCost.ToString();
 
             Handler.PlayCardButton.gameObject.SetActive(false);

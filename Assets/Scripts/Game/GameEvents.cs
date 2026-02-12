@@ -6,4 +6,6 @@ public static class GameEvents
     public static Action<string, int, int> RevealCard;
     public static Action<string, int> SyncBoard;
     public static Action<int> StartNewTurn;
+    public static Action GameEnd;
+
 }
