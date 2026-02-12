@@ -17,10 +17,17 @@ public class GameHandler : MonoBehaviour
     public TMP_Text ScoreTest;
     public TMP_Text CostText;
     public Transform OpponentCardsHolder;
+    public TMP_Text OpponentScoreText;
+    public Button GameOverContinue;
+    public GameObject GameOverPanel;
+    public TMP_Text GameOverHeader;
+    public TMP_Text TotalScoreText;
+
 
     [Space(10)]
     [Header("cards")]
     public CardHandler SelectedCard = null;
+    public CardConfig CardConfig;
 
 
     [Space(10)]

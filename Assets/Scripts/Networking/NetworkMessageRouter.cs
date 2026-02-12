@@ -33,6 +33,8 @@ public class NetworkMessageRouter : NetworkBehaviour
 
         if (NetworkServer.active)
         {
+            ProcessServerMessage(json);
+
             BroadcastFromServer(json);
             return;
         }
@@ -43,9 +45,6 @@ public class NetworkMessageRouter : NetworkBehaviour
         }
     }
 
-    // =========================
-    // SERVER MESSAGE PROCESSING
-    // =========================
     public void ProcessServerMessage(string json)
     {
         BaseMessage baseMsg =
@@ -76,9 +75,7 @@ public class NetworkMessageRouter : NetworkBehaviour
         }
     }
 
-    // =========================
-    // CLIENT MESSAGE PROCESSING
-    // =========================
+
     public void ProcessClientMessage(string json)
     {
         Debug.Log("Client received: " + json);
@@ -101,14 +98,22 @@ public class NetworkMessageRouter : NetworkBehaviour
                 break;
 
             case "endTurn":
-                // Clients do nothing for endTurn
                 break;
+
+            case "scoreUpdate":
+                ScoreMessage score =
+                    JsonConvert.DeserializeObject<ScoreMessage>(json);
+
+                EventManager.Instance.TriggerEvent(
+                    new UpdateScoreEvent(score.p1Score, score.p2Score)
+                );
+                break;
+
         }
     }
 
-    // =========================
-    // HELPERS
-    // =========================
+
+
     void HandleSyncBoard(string json)
     {
         SyncBoardMessage msg =

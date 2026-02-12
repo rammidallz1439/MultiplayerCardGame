@@ -15,6 +15,8 @@ public class GameController : GameManager, IController, ITick
         GameEvents.GameStart += OnGameStart;
         GameEvents.SyncBoard += OnSyncBoard;
         GameEvents.RevealCard += OnRevealCard;
+        GameEvents.StartNewTurn += OnStartNewTurn;
+
 
 
     }
@@ -22,6 +24,7 @@ public class GameController : GameManager, IController, ITick
     public void OnRegisterListeners()
     {
         EventManager.Instance.AddListener<OnCardSelectedEvent>(OnCardSelectedEventHandler);
+        EventManager.Instance.AddListener<UpdateScoreEvent>(UpdateScoreEventHandler);
     }
 
     public void OnRelease()
@@ -32,6 +35,7 @@ public class GameController : GameManager, IController, ITick
     public void OnRemoveListeners()
     {
         EventManager.Instance.RemoveListener<OnCardSelectedEvent>(OnCardSelectedEventHandler);
+        EventManager.Instance.RemoveListener<UpdateScoreEvent>(UpdateScoreEventHandler);
 
     }
 

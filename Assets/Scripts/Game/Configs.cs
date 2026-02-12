@@ -76,5 +76,18 @@ public class SyncBoardMessage
     public List<int> cardIds;
 }
 
+[System.Serializable]
+public class ScoreMessage : BaseMessage
+{
+    public int p1Score;
+    public int p2Score;
+
+    public ScoreMessage()
+    {
+        action = "scoreUpdate";
+    }
+}
+
+
 
 #endregion
