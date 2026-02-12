@@ -200,16 +200,11 @@ public class GameManager
             CardConfig config = DataManager.Instance.LoadJsonFromResources<CardConfig>(GameConstants.CardDataPath);
 
             List<CardData> shuffledCards = GenericEventsController.Instance.Shuffle(config.Cards);
-            for (int i = 0; i < GameConstants.DeckSize; i++)
-            {
 
-                GameObject card = MonoHelper.Instance.InstantiateObject(Handler.CardPrefab, Handler.HandCardsHolder);
-                CardHandler cardHandler = card.GetComponent<CardHandler>();
-                cardHandler.SetCardDetails(shuffledCards[i].ID, shuffledCards[i].Cost, shuffledCards[i].Power, shuffledCards[i].Name);
-                cardHandler.BackFace.SetActive(false);
-
-            }
-
+            GameObject card = MonoHelper.Instance.InstantiateObject(Handler.CardPrefab, Handler.HandCardsHolder);
+            CardHandler cardHandler = card.GetComponent<CardHandler>();
+            cardHandler.SetCardDetails(shuffledCards[0].ID, shuffledCards[0].Cost, shuffledCards[0].Power, shuffledCards[0].Name);
+            cardHandler.BackFace.SetActive(false);
         }
         else
         {
