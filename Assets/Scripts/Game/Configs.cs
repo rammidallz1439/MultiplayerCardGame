@@ -88,6 +88,16 @@ public class ScoreMessage : BaseMessage
     }
 }
 
+[System.Serializable]
+public class StartTurnMessage : BaseMessage
+{
+    public int turn;
+
+    public StartTurnMessage()
+    {
+        action = "startTurn";
+    }
+}
 
 
 #endregion

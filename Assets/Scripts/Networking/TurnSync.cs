@@ -15,6 +15,8 @@ public class TurnSync : MonoBehaviour
     private Dictionary<string, int> totalScores =
     new Dictionary<string, int>();
 
+    private int currentTurn = 1;
+
 
     void Awake()
     {
@@ -139,11 +141,17 @@ public class TurnSync : MonoBehaviour
 
         foldedCards.Clear();
 
-        // wait after reveal
         yield return new WaitForSeconds(1f);
 
-        // trigger next turn
-        GameEvents.StartNewTurn?.Invoke();
+        currentTurn++;
+
+        StartTurnMessage msg = new StartTurnMessage
+        {
+            turn = currentTurn
+        };
+
+        NetworkMessageRouter.Instance.SendMessage(msg);
+
     }
 
     void SendReveal(string playerId, int cardId, int orderIndex)

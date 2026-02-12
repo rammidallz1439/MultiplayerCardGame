@@ -194,6 +194,22 @@ public class GameManager
             Handler.CostText.text = Handler.CurrentCost.ToString();
 
             Handler.PlayCardButton.gameObject.SetActive(false);
+
+
+            Debug.Log("InitializeDeck called");
+            CardConfig config = DataManager.Instance.LoadJsonFromResources<CardConfig>(GameConstants.CardDataPath);
+
+            List<CardData> shuffledCards = GenericEventsController.Instance.Shuffle(config.Cards);
+            for (int i = 0; i < GameConstants.DeckSize; i++)
+            {
+
+                GameObject card = MonoHelper.Instance.InstantiateObject(Handler.CardPrefab, Handler.HandCardsHolder);
+                CardHandler cardHandler = card.GetComponent<CardHandler>();
+                cardHandler.SetCardDetails(shuffledCards[i].ID, shuffledCards[i].Cost, shuffledCards[i].Power, shuffledCards[i].Name);
+                cardHandler.BackFace.SetActive(false);
+
+            }
+
         }
         else
         {
@@ -256,32 +272,31 @@ public class GameManager
     {
         string localId = NetworkMessageRouter.Instance.GetLocalPlayerId();
 
-        // Ignore own sync message
         if (playerId == localId)
             return;
 
-        Debug.Log("Opponent folded cards: " + opponentCardCount);
+        int currentCount = Handler.OpponentCardsHolder.childCount;
+        int cardsToAdd = opponentCardCount - currentCount;
 
-        /*       foreach (Transform child in Handler.OpponentCardsHolder)
-               {
-                   MonoHelper.Instance.DestroyObject(child.gameObject);
-               }*/
+        Debug.Log($"Opponent folded cards: {opponentCardCount}, current: {currentCount}");
 
-        for (int i = 0; i < opponentCardCount; i++)
+        for (int i = 0; i < cardsToAdd; i++)
         {
             GameObject obj = MonoHelper.Instance.InstantiateObject(
-                 Handler.CardPrefab,
-                 Handler.OpponentCardsHolder
-             );
+                Handler.CardPrefab,
+                Handler.OpponentCardsHolder
+            );
 
+            CardHandler card = obj.GetComponent<CardHandler>();
 
+            if (card.BackFace != null)
+                card.BackFace.SetActive(true);
         }
     }
 
     protected void OnRevealCard(string playerId, int cardId, int orderIndex)
     {
         string localId = NetworkMessageRouter.Instance.GetLocalPlayerId();
-
         bool isOpponent = playerId != localId;
 
         Transform holder = isOpponent
@@ -301,25 +316,19 @@ public class GameManager
         CardData data = config.Cards.Find(c => c.ID == cardId);
         if (data == null) return;
 
-        GameObject obj = MonoHelper.Instance.InstantiateObject(
-              Handler.CardPrefab,
-              holder
-          );
-        CardHandler card = obj.GetComponent<CardHandler>();
+        Transform slot = holder.GetChild(orderIndex);
+        CardHandler card = slot.GetComponent<CardHandler>();
 
         card.SetCardDetails(
-      data.ID,
-      data.Cost,
-      data.Power,
-      data.Name
-  );
+            data.ID,
+            data.Cost,
+            data.Power,
+            data.Name
+        );
 
-        // reveal the card face
+        // Reveal face
         if (card.BackFace != null)
-        {
             card.BackFace.SetActive(false);
-        }
-
     }
 
     public void RevealAllCards(string playerId, List<int> cardIds)
@@ -348,5 +357,19 @@ public class GameManager
 
         SceneManager.LoadScene("Menu");
     }
+
+
+    protected void OnStartNewTurn(int turn)
+    {
+        Handler.CurrentTurn = turn;
+        Handler.TurnCount.text = $"{Handler.CurrentTurn} / {GameConstants.TotalTurns}";
+
+        Handler.CurrentCost = Handler.CurrentTurn;
+        Handler.CostText.text = Handler.CurrentCost.ToString();
+
+        Handler.CurrentTime = Handler.TurnDuration;
+        Handler.IsRunning = true;
+    }
+
     #endregion
 }

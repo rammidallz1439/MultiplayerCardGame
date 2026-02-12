@@ -108,6 +108,13 @@ public class NetworkMessageRouter : NetworkBehaviour
                     new UpdateScoreEvent(score.p1Score, score.p2Score)
                 );
                 break;
+            case "startTurn":
+                StartTurnMessage turnMsg =
+                    JsonConvert.DeserializeObject<StartTurnMessage>(json);
+
+                GameEvents.StartNewTurn?.Invoke(turnMsg.turn);
+                break;
+
 
         }
     }
