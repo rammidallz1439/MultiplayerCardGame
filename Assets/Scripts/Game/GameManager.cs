@@ -128,14 +128,14 @@ public class GameManager
 
     protected void OnStartNewTurn()
     {
-        Handler.CurrentTurn++;
 
-        // check win/lose
-        if (Handler.CurrentTurn > GameConstants.TotalTurns)
+        if (Handler.CurrentTurn >= GameConstants.TotalTurns)
         {
             DetermineWinner();
             return;
         }
+
+        Handler.CurrentTurn++;
 
         Handler.CurrentCost = Handler.CurrentTurn;
         Handler.CostText.text = Handler.CurrentCost.ToString();
@@ -218,6 +218,9 @@ public class GameManager
 
     private void EndTurn()
     {
+        if (!Handler.IsRunning)
+            return;
+
         Handler.IsRunning = false;
 
         string playerId = NetworkMessageRouter.Instance.GetLocalPlayerId();
